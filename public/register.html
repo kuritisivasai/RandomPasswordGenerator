@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register - Password Generator</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-wrapper">
+
+        <div class="auth-card">
+
+            <!-- Logo -->
+
+            <div class="auth-logo register-logo">
+                ✨
+            </div>
+
+
+            <!-- Heading -->
+
+            <h1>Create Account</h1>
+
+            <p class="auth-subtitle">
+                Create your account and secure your passwords
+            </p>
+
+
+            <!-- Register Form -->
+
+            <form id="registerForm">
+
+
+                <!-- Name -->
+
+                <div class="auth-field">
+
+                    <label for="name">
+                        👤 Full Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        placeholder="Enter your full name"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="auth-field">
+
+                    <label for="email">
+                        📧 Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Password -->
+
+                <div class="auth-field">
+
+                    <label for="password">
+                        🔑 Password
+                    </label>
+
+                    <div class="password-input">
+
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Create a password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="show-password"
+                            onclick="togglePassword()"
+                        >
+                            👁
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Register Button -->
+
+                <button
+                    type="submit"
+                    class="auth-btn register-btn"
+                >
+                    🚀 Create Account
+                </button>
+
+            </form>
+
+
+            <!-- Message -->
+
+            <p id="message" class="auth-message"></p>
+
+
+            <!-- Login Link -->
+
+            <div class="auth-footer">
+
+                <span>
+                    Already have an account?
+                </span>
+
+                <a href="index.html">
+                    Login
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Bottom Branding -->
+
+        <p class="auth-brand">
+            🔐 Password Generator
+        </p>
+
+    </div>
+
+
+    <script src="register.js"></script>
+
+    <script>
+
+        function togglePassword() {
+
+            const password =
+                document.getElementById("password");
+
+            const button =
+                document.querySelector(".show-password");
+
+            if (password.type === "password") {
+
+                password.type = "text";
+
+                button.textContent = "🙈";
+
+            } else {
+
+                password.type = "password";
+
+                button.textContent = "👁";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

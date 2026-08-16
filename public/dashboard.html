@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Password Generator Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <!-- Dashboard Header -->
+
+    <header class="dashboard-header">
+
+        <div>
+            <h1>🔐 Password Generator</h1>
+            <p>Generate and manage secure passwords</p>
+        </div>
+
+        <div class="header-actions">
+
+            <button id="themeBtn">
+                🌙 Dark Mode
+            </button>
+
+            <button id="logoutBtn">
+                🚪 Logout
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- Main Dashboard -->
+
+    <main class="dashboard-container">
+
+
+        <!-- Welcome -->
+
+        <section class="welcome-card">
+
+            <h2>Welcome back! 👋</h2>
+
+            <p>
+                Create strong and secure passwords for your accounts.
+            </p>
+
+        </section>
+
+
+        <!-- Statistics -->
+
+        <section class="stats-container">
+
+            <div class="stat-card">
+
+                <h3>🔐</h3>
+
+                <p>Passwords Generated</p>
+
+                <strong id="totalGenerated">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>💾</h3>
+
+                <p>Saved Passwords</p>
+
+                <strong id="totalSaved">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <h3>🛡️</h3>
+
+                <p>Strong Passwords</p>
+
+                <strong id="strongCount">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- Password Generator -->
+
+        <section class="generator-card">
+
+            <h2>Generate Secure Password</h2>
+
+
+            <!-- Password Length -->
+
+            <div class="option-group">
+
+                <label for="length">
+                    Password Length
+                </label>
+
+                <input
+                    type="number"
+                    id="length"
+                    value="12"
+                    min="4"
+                    max="30"
+                >
+
+            </div>
+
+
+            <!-- Character Options -->
+
+            <div class="checkbox-container">
+
+                <label>
+                    <input
+                        type="checkbox"
+                        id="uppercase"
+                        checked
+                    >
+                    Uppercase
+                </label>
+
+
+                <label>
+                    <input
+                        type="checkbox"
+                        id="lowercase"
+                        checked
+                    >
+                    Lowercase
+                </label>
+
+
+                <label>
+                    <input
+                        type="checkbox"
+                        id="numbers"
+                        checked
+                    >
+                    Numbers
+                </label>
+
+
+                <label>
+                    <input
+                        type="checkbox"
+                        id="symbols"
+                        checked
+                    >
+                    Symbols
+                </label>
+
+            </div>
+
+
+            <!-- Generate -->
+
+            <button
+                class="generate-btn"
+                onclick="generatePassword()"
+            >
+                ⚡ Generate Password
+            </button>
+
+
+            <!-- Generated Password -->
+
+            <div class="password-result">
+
+                <input
+                    type="text"
+                    id="generatedPassword"
+                    placeholder="Your password will appear here"
+                    readonly
+                >
+
+                <button onclick="copyPassword()">
+                    📋 Copy
+                </button>
+
+            </div>
+
+
+            <!-- Strength -->
+
+            <div class="strength-container">
+
+                <p>
+                    Password Strength:
+                </p>
+
+                <p
+                    class="strength"
+                    id="strength"
+                >
+                    Generate a password
+                </p>
+
+            </div>
+
+
+            <!-- Save -->
+
+            <button
+                class="save-btn"
+                onclick="savePassword()"
+            >
+                💾 Save Password
+            </button>
+
+        </section>
+
+
+        <!-- Saved Passwords -->
+
+        <section class="saved-card">
+
+            <div class="saved-header">
+
+                <h2>
+                    📋 Saved Passwords
+                </h2>
+
+                <button
+                    class="clear-btn"
+                    onclick="clearPasswords()"
+                >
+                    🗑️ Clear All
+                </button>
+
+            </div>
+
+
+            <div id="passwordList">
+
+                <p class="empty-message">
+                    No saved passwords yet.
+                </p>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <script src="dashboard.js"></script>
+
+</body>
+
+</html>
