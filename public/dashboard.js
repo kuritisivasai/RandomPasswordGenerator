@@ -1,73 +1,19 @@
-// ========================================
-// CUSTOM NOTIFICATION
-// ========================================
+// ===============================
+// AUTH TOKEN
+// ===============================
 
-function showNotification(
-    message,
-    title = "Success",
-    type = "success"
-) {
-
-    const modal =
-        document.getElementById("notificationModal");
-
-    const icon =
-        document.getElementById("notificationIcon");
-
-    const titleElement =
-        document.getElementById("notificationTitle");
-
-    const messageElement =
-        document.getElementById("notificationMessage");
+const token = localStorage.getItem("token");
 
 
-    titleElement.textContent = title;
+// ===============================
+// CHECK LOGIN
+// ===============================
 
-    messageElement.textContent = message;
-
-
-    if (type === "success") {
-
-        icon.textContent = "✓";
-
-        icon.style.background = "#dcfce7";
-
-        icon.style.color = "#16a34a";
-
-    }
-
-    else if (type === "error") {
-
-        icon.textContent = "!";
-
-        icon.style.background = "#fee2e2";
-
-        icon.style.color = "#dc2626";
-
-    }
-
-    else if (type === "warning") {
-
-        icon.textContent = "!";
-
-        icon.style.background = "#fef3c7";
-
-        icon.style.color = "#d97706";
-
-    }
-
-
-    modal.classList.add("show");
+if (!token) {
+    window.location.href = "index.html";
 }
 
 
-function closeNotification() {
-
-    const modal =
-        document.getElementById("notificationModal");
-
-    modal.classList.remove("show");
-}
 // ===============================
 // Dashboard Variables
 // ===============================
@@ -100,18 +46,16 @@ async function generatePassword() {
             document.getElementById("symbols").checked;
 
 
-        // Check at least one option
-
         if (!uppercase && !lowercase && !numbers && !symbols) {
 
             alert("Please select at least one character type.");
-
             return;
+
         }
 
 
         const response = await fetch(
-            "http://localhost:3000/api/password/generate",
+            "/api/password/generate",
             {
                 method: "POST",
 
@@ -136,18 +80,14 @@ async function generatePassword() {
         if (!response.ok) {
 
             alert(data.message || "Password generation failed.");
-
             return;
+
         }
 
-
-        // Display password
 
         document.getElementById("generatedPassword").value =
             data.password;
 
-
-        // Update statistics
 
         generatedCount++;
 
@@ -155,21 +95,19 @@ async function generatePassword() {
             generatedCount;
 
 
-        // Check password strength
-
         checkPasswordStrength(data.password);
 
     }
 
     catch (error) {
 
-        console.error(error);
+        console.error("Generate error:", error);
 
         alert("Unable to connect to the server.");
 
     }
-}
 
+}
 
 
 // ===============================
@@ -181,8 +119,6 @@ function checkPasswordStrength(password) {
     let score = 0;
 
 
-    // Length
-
     if (password.length >= 8) {
         score++;
     }
@@ -191,29 +127,17 @@ function checkPasswordStrength(password) {
         score++;
     }
 
-
-    // Lowercase
-
     if (/[a-z]/.test(password)) {
         score++;
     }
-
-
-    // Uppercase
 
     if (/[A-Z]/.test(password)) {
         score++;
     }
 
-
-    // Numbers
-
     if (/[0-9]/.test(password)) {
         score++;
     }
-
-
-    // Symbols
 
     if (/[^A-Za-z0-9]/.test(password)) {
         score++;
@@ -256,9 +180,10 @@ function checkPasswordStrength(password) {
 
         document.getElementById("strongCount").textContent =
             strongPasswordCount;
-    }
-}
 
+    }
+
+}
 
 
 // ===============================
@@ -274,8 +199,8 @@ async function copyPassword() {
     if (password === "") {
 
         alert("Generate a password first!");
-
         return;
+
     }
 
 
@@ -289,8 +214,6 @@ async function copyPassword() {
 
     catch (error) {
 
-        // Fallback for older browsers
-
         const passwordInput =
             document.getElementById("generatedPassword");
 
@@ -299,9 +222,10 @@ async function copyPassword() {
         document.execCommand("copy");
 
         alert("Password Copied!");
-    }
-}
 
+    }
+
+}
 
 
 // ===============================
@@ -317,8 +241,8 @@ async function savePassword() {
     if (password === "") {
 
         alert("Generate a password first!");
-
         return;
+
     }
 
 
@@ -329,22 +253,18 @@ async function savePassword() {
     try {
 
         const response = await fetch(
-            "http://localhost:3000/api/password/save",
+            "/api/password/save",
             {
                 method: "POST",
 
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
 
                 body: JSON.stringify({
-
-                    user_id: 1,
-
                     password,
-
                     strength
-
                 })
             }
         );
@@ -353,15 +273,32 @@ async function savePassword() {
         const data = await response.json();
 
 
-        if (!response.ok) {
+        if (response.status === 401) {
 
-            alert(data.message || "Unable to save password.");
+            localStorage.removeItem("token");
+
+            alert("Session expired. Please login again.");
+
+            window.location.href = "index.html";
 
             return;
+
         }
 
 
-        alert(data.message);
+        if (!response.ok) {
+
+            alert(
+                data.message ||
+                "Unable to save password."
+            );
+
+            return;
+
+        }
+
+
+        alert("Password Saved Successfully!");
 
         loadPasswords();
 
@@ -369,13 +306,13 @@ async function savePassword() {
 
     catch (error) {
 
-        console.error(error);
+        console.error("Save error:", error);
 
         alert("Unable to connect to the server.");
 
     }
-}
 
+}
 
 
 // ===============================
@@ -387,12 +324,39 @@ async function loadPasswords() {
     try {
 
         const response = await fetch(
-            "http://localhost:3000/api/password/all"
+            "/api/password/all",
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
         );
 
 
         const passwords =
             await response.json();
+
+
+        if (response.status === 401) {
+
+            localStorage.removeItem("token");
+
+            window.location.href = "index.html";
+
+            return;
+
+        }
+
+
+        if (!response.ok) {
+
+            console.error(passwords.message);
+
+            return;
+
+        }
 
 
         const passwordList =
@@ -412,6 +376,7 @@ async function loadPasswords() {
             `;
 
             return;
+
         }
 
 
@@ -421,7 +386,6 @@ async function loadPasswords() {
         passwords.forEach((item) => {
 
             html += `
-
                 <div class="password-card">
 
                     <p>
@@ -447,7 +411,6 @@ async function loadPasswords() {
                     </button>
 
                 </div>
-
             `;
 
         });
@@ -459,13 +422,11 @@ async function loadPasswords() {
 
     catch (error) {
 
-        console.error(error);
-
-        console.log("Unable to load saved passwords.");
+        console.error("Load passwords error:", error);
 
     }
-}
 
+}
 
 
 // ===============================
@@ -487,8 +448,8 @@ async function copySavedPassword(password) {
         alert("Unable to copy password.");
 
     }
-}
 
+}
 
 
 // ===============================
@@ -498,7 +459,9 @@ async function copySavedPassword(password) {
 async function deletePassword(id) {
 
     const confirmDelete =
-        confirm("Are you sure you want to delete this password?");
+        confirm(
+            "Are you sure you want to delete this password?"
+        );
 
 
     if (!confirmDelete) {
@@ -508,13 +471,46 @@ async function deletePassword(id) {
 
     try {
 
-        await fetch(
-            `http://localhost:3000/api/password/${id}`,
+        const response = await fetch(
+            `/api/password/${id}`,
             {
-                method: "DELETE"
+                method: "DELETE",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             }
         );
 
+
+        const data =
+            await response.json();
+
+
+        if (response.status === 401) {
+
+            localStorage.removeItem("token");
+
+            window.location.href = "index.html";
+
+            return;
+
+        }
+
+
+        if (!response.ok) {
+
+            alert(
+                data.message ||
+                "Unable to delete password."
+            );
+
+            return;
+
+        }
+
+
+        alert("Password Deleted Successfully!");
 
         loadPasswords();
 
@@ -522,13 +518,13 @@ async function deletePassword(id) {
 
     catch (error) {
 
-        console.error(error);
+        console.error("Delete error:", error);
 
         alert("Unable to delete password.");
 
     }
-}
 
+}
 
 
 // ===============================
@@ -550,22 +546,43 @@ async function clearPasswords() {
 
     try {
 
-        const response =
-            await fetch(
-                "http://localhost:3000/api/password/all"
-            );
+        const response = await fetch(
+            "/api/password/all",
+            {
+                method: "GET",
+
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
 
 
         const passwords =
             await response.json();
 
 
+        if (response.status === 401) {
+
+            localStorage.removeItem("token");
+
+            window.location.href = "index.html";
+
+            return;
+
+        }
+
+
         for (const item of passwords) {
 
             await fetch(
-                `http://localhost:3000/api/password/${item.id}`,
+                `/api/password/${item.id}`,
                 {
-                    method: "DELETE"
+                    method: "DELETE",
+
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
                 }
             );
 
@@ -578,13 +595,13 @@ async function clearPasswords() {
 
     catch (error) {
 
-        console.error(error);
+        console.error("Clear passwords error:", error);
 
         alert("Unable to clear passwords.");
 
     }
-}
 
+}
 
 
 // ===============================
@@ -597,31 +614,37 @@ const themeBtn =
 
 if (themeBtn) {
 
-    themeBtn.addEventListener("click", () => {
+    themeBtn.addEventListener(
+        "click",
+        () => {
 
-        document.body.classList.toggle("dark-mode");
+            document.body.classList.toggle(
+                "dark-mode"
+            );
 
 
-        if (
-            document.body.classList.contains("dark-mode")
-        ) {
+            if (
+                document.body.classList.contains(
+                    "dark-mode"
+                )
+            ) {
 
-            themeBtn.textContent =
-                "☀️ Light Mode";
+                themeBtn.textContent =
+                    "☀️ Light Mode";
+
+            }
+
+            else {
+
+                themeBtn.textContent =
+                    "🌙 Dark Mode";
+
+            }
 
         }
-
-        else {
-
-            themeBtn.textContent =
-                "🌙 Dark Mode";
-
-        }
-
-    });
+    );
 
 }
-
 
 
 // ===============================
@@ -634,31 +657,40 @@ const logoutBtn =
 
 if (logoutBtn) {
 
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener(
+        "click",
+        () => {
 
-        const confirmLogout =
-            confirm("Are you sure you want to logout?");
+            const confirmLogout =
+                confirm(
+                    "Are you sure you want to logout?"
+                );
 
 
-        if (confirmLogout) {
+            if (confirmLogout) {
 
-            // JWT logout will be connected later
+                localStorage.removeItem("token");
 
-            localStorage.removeItem("token");
+                window.location.href =
+                    "index.html";
 
-            window.location.href =
-                "index.html";
+            }
 
         }
-
-    });
+    );
 
 }
 
 
-
 // ===============================
-// Load passwords when dashboard opens
+// Load Passwords When Dashboard Opens
 // ===============================
 
-loadPasswords();
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        loadPasswords();
+
+    }
+);
